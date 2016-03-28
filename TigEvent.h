@@ -4,7 +4,6 @@
 #include <vector>
 #include <string>
 
-using namespace std;
 
 class TigEvent
 {
@@ -13,11 +12,11 @@ public:				//----- public ---------------------
   ~TigEvent(void);
   int Address(){return mAddress;}
   void AddWfSample(int pSample);
-  int CalcWfBase(vector<int> pParameters);
-  int CalcWfEnergy(vector<int> pParameters);
+  int CalcWfBase(std::vector<int> pParameters);
+  int CalcWfEnergy(std::vector<int> pParameters);
   int CalcWfMaxBin();
   int CalcWfMinBin();
-  int CalcWfPeak(vector<int> pParameters);
+  int CalcWfPeak(std::vector<int> pParameters);
   int CFD(){return mCFD;}
   int Charge(){return mCharge;}
   int EventID(){return mEventID;}
@@ -35,8 +34,8 @@ public:				//----- public ---------------------
   int TimestampUp(){return mTimestampUp;}
   int TriggersAccepted(){return mTriggersAccepted;}
   int TriggersRequested(){return mTriggersRequested;}
-  int Value(int pDataType, vector<int> pParameters);
-  vector<short> Waveform(){return mWaveform;}
+  int Value(int pDataType, std::vector<int> pParameters);
+  std::vector<short> Waveform(){return mWaveform;}
 
 protected:			//----- protected ------------------
   int mAddress;
@@ -48,7 +47,7 @@ protected:			//----- protected ------------------
   int mTimestampUp;
   int mTriggersAccepted;
   int mTriggersRequested;
-  vector<short> mWaveform;
+  std::vector<short> mWaveform;
  
 private:			//----- private --------------------
 					TigEvent(const TigEvent& pToCopy);

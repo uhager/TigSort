@@ -4,9 +4,8 @@
 #ifndef TIGTIMER_H
 #define TIGTIMER_H
 
-#include <sys/time.h>
-#include <assert.h>
 #include <TTimer.h>
+
 
 class TigTimer : public TTimer
 {

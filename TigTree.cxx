@@ -1,6 +1,8 @@
 #include <iostream>
-#include <TigTree.h>
-#include <TigManager.h>
+
+#include "TigManager.h"
+
+#include "TigTree.h"
 
 static const long gIndexOffset = 2; //offset in tree for TigSort EventID, Trigger EventID
 
@@ -15,7 +17,7 @@ TigAssemble::TigAssemble(void)
 //---- ~TigAssemble
 TigAssemble::~TigAssemble(void)
 {
-  vector<int*>::iterator pInt;
+  std::vector<int*>::iterator pInt;
   for (pInt=mEventData.begin(); pInt<mEventData.end(); pInt++) delete[] (*pInt);
   mEventData.clear();
   for (int i = mWaveforms.size()-1; i>-1; i--) {
@@ -45,13 +47,13 @@ TigAssemble::AddDetector(int pSignals)
 void
 TigAssemble::AddWfData(int pDetector, int pChannel, int pSamples, int* pValue)
 {
-  //  cout << "[TigAssemble::AddWfData] det " << pDetector <<  " ch " << pChannel << " samples " << pSamples  << endl;
+  //  std::cout << "[TigAssemble::AddWfData] det " << pDetector <<  " ch " << pChannel << " samples " << pSamples  << std::endl;
   int* data = mWaveforms.at(pDetector).at(pChannel);
   for (int i=0; i<pSamples ; i++){
     data[i] = pValue[i];
-    //    cout << mWaveforms.at(pDetector).at(pChannel)[i] << " - " ;
+    //    std::cout << mWaveforms.at(pDetector).at(pChannel)[i] << " - " ;
   }
-  //  cout << endl;
+  //  std::cout << std::endl;
   mNWf.at(pDetector).at(pChannel) = pSamples;
 }
 
@@ -59,9 +61,9 @@ TigAssemble::AddWfData(int pDetector, int pChannel, int pSamples, int* pValue)
 void
 TigAssemble::AddWfDetector(int pSignals, int pSamples)
 {
-  //  cout << "[TigAssemble::AddWfDetector] signals " << pSignals << " samples " << pSamples  << endl;
-  vector<int*> toAdd;
-  vector<int> nsample;
+  //  std::cout << "[TigAssemble::AddWfDetector] signals " << pSignals << " samples " << pSamples  << std::endl;
+  std::vector<int*> toAdd;
+  std::vector<int> nsample;
   for (int i=0; i<pSignals; i++){
   int *samples = new int[pSamples];
   ::memset(samples, 0,  pSamples * sizeof(int));
@@ -84,14 +86,14 @@ TigAssemble::Data(int pDet)
 int*
 TigAssemble::Waveform(int pDet, int pChannel)
 {
-  //  cout << "[TigAssemble::Waveform]" << endl;
+  //  std::cout << "[TigAssemble::Waveform]" << std::endl;
   return mWaveforms.at(pDet).at(pChannel);
 }
 
-vector<int*>
+std::vector<int*>
 TigAssemble::WaveformForDetector(int pDet)
 {
-  //  cout << "[TigAssemble::WaveformForDetector]" << endl;
+  //  std::cout << "[TigAssemble::WaveformForDetector]" << std::endl;
   return mWaveforms.at(pDet);
 }
 
@@ -105,18 +107,18 @@ TigTree::TigTree(void)
   , mAssembled(NULL)
   , mTree(NULL)
   , mBuffer(1000)
-  ,mTimeStamp(0)
+  , mTimeStamp(0)
 {
 }
 
 //---- ~TigTree
 TigTree::~TigTree(void)
 {
-  vector<TigDetector*>::iterator detector;
+  std::vector<TigDetector*>::iterator detector;
   for (detector= mDetectors.begin(); detector < mDetectors.end(); detector++) delete (*detector);
-  vector<TigWaveform*>::iterator wave;
+  std::vector<TigWaveform*>::iterator wave;
   for (wave = mWaveforms.begin(); wave < mWaveforms.end(); wave++) delete (*wave);
-  vector<TigAssemble*>::iterator assemble;
+  std::vector<TigAssemble*>::iterator assemble;
   for (assemble= mAssembled.begin(); assemble < mAssembled.end(); assemble++) delete (*assemble);
   mDetectors.clear();
   mWaveforms.clear();
@@ -138,16 +140,16 @@ TigTree::AddEvent(int pEventID)
   int result;
   for (result=0; result<mAssembled.size(); result++){
     if ( (mAssembled.at(result))->EventID() == pEventID ){
-      //cout << "[TigTree::AddEvent] found event " << (mAssembled.at(result))->eventID << " at " << result <<endl;
+      //std::cout << "[TigTree::AddEvent] found event " << (mAssembled.at(result))->eventID << " at " << result <<std::endl;
       return result;
     }
   }
   mAssembled.push_back(new TigAssemble());
   mAssembled.back()->SetEventID(pEventID);
-  vector<TigDetector*>::iterator detector;
+  std::vector<TigDetector*>::iterator detector;
   for (detector= mDetectors.begin(); detector < mDetectors.end(); detector++) mAssembled.back()->AddDetector( (*detector)->Size());
 
-  vector<TigWaveform*>::iterator wfdetector;
+  std::vector<TigWaveform*>::iterator wfdetector;
   for (wfdetector= mWaveforms.begin(); wfdetector < mWaveforms.end(); wfdetector++) mAssembled.back()->AddWfDetector( (*wfdetector)->Size(), (*wfdetector)->Samples());
 
   result = mAssembled.size() - 1;
@@ -170,7 +172,7 @@ TigTree::AddWaveform(TigWaveform* pToAdd)
 
 //---- Banks
 void
-TigTree::Banks(vector<string> &pRequested)
+TigTree::Banks(std::vector<std::string> &pRequested)
 {
   for (int i = 0; i<mScalers.size(); i++) pRequested.push_back( mScalers[i]->Bank() );
 }
@@ -187,7 +189,7 @@ TigTree::BranchCount(void) const
 void
 TigTree::FlushBuffer()
 {
-  vector<TigAssemble*>::iterator assembled;
+  std::vector<TigAssemble*>::iterator assembled;
   for (assembled= mAssembled.begin(); assembled < mAssembled.end(); assembled++) {
     this->FillTree(*assembled);
     delete (*assembled);
@@ -210,33 +212,33 @@ TigTree::FillTree()
 bool
 TigTree::FillTree(TigAssemble* pAssembled)
 {
-  //  cout << "[TigTree::FillTree] filling, events " << mAssembled.size() ;
+  //  std::cout << "[TigTree::FillTree] filling, events " << mAssembled.size() ;
   //  mAnaEventID = TigManager::Instance().AnaEventID();
   mAnaEventID = pAssembled->AnaEventID();
   mTrigEventID = pAssembled->EventID();
   mTimeStamp = TigManager::Instance().TimeStamp();
   if (mDetectors.size() != pAssembled->Size() ){
-    cout << "[TigTree::FillTree] detector size mismatch" << endl;
+    std::cout << "[TigTree::FillTree] detector size mismatch" << std::endl;
     return 0;
   }
   for (int i =0; i<mDetectors.size(); i++){
     int* detData = pAssembled->Data(i);
     bool process = mDetectors.at(i)->ProcessEvent(detData);
-    //	if (process == false ) cout << "[TigTree::FillTree] event size mismatch" << endl;
+    //	if (process == false ) std::cout << "[TigTree::FillTree] event size mismatch" << std::endl;
   }
   for (int i =0; i<mWaveforms.size(); i++){
-    vector<int*> pWf = pAssembled->WaveformForDetector(i);
-    vector<int> pSamples = pAssembled->NSamplesForDetector(i);
+    std::vector<int*> pWf = pAssembled->WaveformForDetector(i);
+    std::vector<int> pSamples = pAssembled->NSamplesForDetector(i);
     for (int j=0; j<pWf.size(); j++){
       int samples = pSamples.at(j);
       if (samples < 1) {
-	//	cout << "[TigTree::FillTree] " << mWaveforms.at(i)->Name() << " no samples: " << samples << endl;
+	//	std::cout << "[TigTree::FillTree] " << mWaveforms.at(i)->Name() << " no samples: " << samples << std::endl;
 	continue;
       }
       int* waveform = pWf.at(j);
       bool process = mWaveforms.at(i)->ProcessWfEvent(j, waveform, samples);
-      //      cout << "[TigTree::FillTree] " << mWaveforms.at(i)->Name() << " " << j << " "  << mWaveforms.at(i)->mNWf[j] << endl;
-    //	if (process == false ) cout << "[TigTree::FillTree] event size mismatch" << endl;
+      //      std::cout << "[TigTree::FillTree] " << mWaveforms.at(i)->Name() << " " << j << " "  << mWaveforms.at(i)->mNWf[j] << std::endl;
+    //	if (process == false ) std::cout << "[TigTree::FillTree] event size mismatch" << std::endl;
     }
   }
   mTree->Fill();
@@ -248,7 +250,7 @@ TigTree::FillTree(TigAssemble* pAssembled)
 
 //---- FindScalerBank
 bool 
-TigTree::FindScalerBank(string pBankName)
+TigTree::FindScalerBank(std::string pBankName)
 {
   for (int i = 0; i<mScalers.size(); i++) if ( pBankName.compare(mScalers[i]->Bank()) == 0 ) return true;
   return false;
@@ -262,8 +264,8 @@ TigTree::Initialize(void)
   mTree->Branch("AnalyserEventID",&mAnaEventID,"AnalyserEventID/I");
   mTree->Branch("MidasTimeStamp",&mTimeStamp,"MidasTimeStamp/I");
   if (mDetectors.size()>0) mTree->Branch("TrigEventID",&mTrigEventID,"TrigEventID/I");
-  vector<TigDetector*>::iterator detector;
-  //  cout << "TigTree::Initialize" << endl;
+  std::vector<TigDetector*>::iterator detector;
+  //  std::cout << "TigTree::Initialize" << std::endl;
   for (detector= mDetectors.begin(); detector < mDetectors.end(); detector++)
     {
       char hitName[256], bName[256], bLeaf[256];
@@ -283,7 +285,7 @@ TigTree::Initialize(void)
       mTree->Branch(bName,(*detector)->mEventData, bLeaf);
       }
     }
-  vector<TigScaler*>::iterator scaler;
+  std::vector<TigScaler*>::iterator scaler;
   for (scaler = mScalers.begin(); scaler < mScalers.end(); scaler++)
     {
       for (int i=0; i< (*scaler)->Size() ; i++ )
@@ -293,7 +295,7 @@ TigTree::Initialize(void)
 	  mTree->Branch((*scaler)->Name(i).c_str(),&((*scaler)->mEventData[i]), bLeaf);
 	}
     }
-  vector<TigWaveform*>::iterator wfDet;
+  std::vector<TigWaveform*>::iterator wfDet;
   for (wfDet= mWaveforms.begin(); wfDet < mWaveforms.end(); wfDet++)
     {
       for (int i=0; i<(*wfDet)->Size(); i++){
@@ -312,12 +314,12 @@ TigTree::Initialize(void)
 }
 
 //---- MakeAssembled
-vector<int*>
+std::vector<int*>
 TigTree::MakeAssembled()
 {
-  vector<int*> result;
+  std::vector<int*> result;
   int* signals;
-  vector<TigDetector*>::iterator detector;
+  std::vector<TigDetector*>::iterator detector;
   for (detector= mDetectors.begin(); detector < mDetectors.end(); detector++)
    {
      int numSignals = (*detector)->Size();
@@ -330,7 +332,7 @@ TigTree::MakeAssembled()
 
 //---- ProcessScaler
 bool
-TigTree::ProcessScaler(string pBankName, vector<int> pValues)
+TigTree::ProcessScaler(std::string pBankName, std::vector<int> pValues)
 {
   for (int i = 0; i<mScalers.size(); i++) {
     if ( pBankName.compare(mScalers.at(i)->Bank()) == 0 ) {
@@ -363,12 +365,12 @@ TigTree::ProcessSignal(TigEvent* pEvent)
       int channel = -1;
       int samples = mWaveforms.at(i)->Samples() ;
       int *waveform = new int[samples];
-      //      cout << "[TigTree::ProcessSignal] waveform samples " << samples << endl;
+      //      std::cout << "[TigTree::ProcessSignal] waveform samples " << samples << std::endl;
       mWaveforms.at(i)->ProcessWfSignal(pEvent,&channel, &samples, waveform);
       if (channel == -1) continue;
-      // cout << "[TigTree::ProcessSignal] waveform " ;
-      // for (int j=0; j<samples; j++) cout << waveform[j] << " - " ;
-      // cout << endl;
+      // std::cout << "[TigTree::ProcessSignal] waveform " ;
+      // for (int j=0; j<samples; j++) std::cout << waveform[j] << " - " ;
+      // std::cout << std::endl;
       mAssembled.at(assembledNo)->AddWfData(i,channel,samples,waveform);
       result = true;
     }

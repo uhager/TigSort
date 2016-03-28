@@ -4,12 +4,10 @@
 #ifndef TIGWAVEFORM_H
 #define TIGWAVEFORM_H
 
-#include <vector>
-#include <string>
-#include <TTree.h>
-#include <TigDetector.h>
 
-using namespace std;
+#include "TigDetector.h"
+
+
 
 class TigWaveform : public TigDetector
 {

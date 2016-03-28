@@ -2,7 +2,8 @@
 // author: Ulrike Hager
 
 #include <iostream>
-#include <TigDetector.h>
+
+#include "TigDetector.h"
 
 //---- TigDetector
 TigDetector::TigDetector(void)
@@ -13,7 +14,7 @@ TigDetector::TigDetector(void)
 , mHits(0)
 {
 int param[] = {10,15, 200,205, 165,176};
- mParameters = vector<int>(param, param + sizeof(param)/sizeof(int) ); 
+ mParameters = std::vector<int>(param, param + sizeof(param)/sizeof(int) ); 
 }
 
 //---- ~TigDetector
@@ -44,9 +45,9 @@ TigDetector::AddSignals(int minCh, int maxCh, int minAdd, int maxAdd)
   int addStep;
   if (minAdd < maxAdd) addStep = (maxAdd - minAdd +1)/numCh;
   else addStep = (maxAdd - minAdd -1)/numCh;
-  // cout << "[TigDetector::AddSignals] minAdd " << hex << minAdd << " maxAdd " << maxAdd << " addStep " << dec << addStep << endl; 
+  // std::cout << "[TigDetector::AddSignals] minAdd " << hex << minAdd << " maxAdd " << maxAdd << " addStep " << dec << addStep << std::endl; 
   for (int i=minCh, add = minAdd; i<maxCh+1; i = i+chStep, add=add+addStep){
-    //cout << "[TigDetector::AddSignals] adding " << dec<< i << " - " << hex << add << endl; 
+    //std::cout << "[TigDetector::AddSignals] adding " << dec<< i << " - " << hex << add << std::endl; 
     this->AddSignal(i, add);
   }
 }
@@ -104,10 +105,10 @@ TigDetector::ProcessSignal(TigEvent* pEvent, int (&pData)[2])
       result = true;
       pData[0] = mAddresses[addr]; 
       pData[1] = pEvent->Value(mDataType, mParameters);
-      // cout << "[TigDetector::ProcessSignal] channel " << pData[0] << " data " << pData[1] << endl;
+      // std::cout << "[TigDetector::ProcessSignal] channel " << pData[0] << " data " << pData[1] << std::endl;
        return result;
     }
- // cout << "unknown channel " << pChannel << endl;
+ // std::cout << "unknown channel " << pChannel << std::endl;
  return result;
 }
 
@@ -121,7 +122,7 @@ TigDetector::Reset()
 
 //---- SetDataType
 void
-TigDetector::SetDataType(string pTypeString, vector<int> pParameters)
+TigDetector::SetDataType(std::string pTypeString, std::vector<int> pParameters)
 {
   if (pTypeString.compare("Charge") == 0) mDataType = 0;
   else if (pTypeString.compare("CFD") == 0) mDataType = 1;
@@ -150,10 +151,10 @@ TigDetector::SetDataType(string pTypeString, vector<int> pParameters)
 	break;
       }      
     }
-    cout << "[TigDetector::SetDataType] parameters: " ;
-    for (int i=0; i<mParameters.size(); i++) cout << mParameters.at(i) << ", ";
-    cout << endl;
+    std::cout << "[TigDetector::SetDataType] parameters: " ;
+    for (int i=0; i<mParameters.size(); i++) std::cout << mParameters.at(i) << ", ";
+    std::cout << std::endl;
   }
-  //  cout << "[TigDetector::SetDataType] " << pTypeString << " data type is " << mDataType << endl;
+  //  std::cout << "[TigDetector::SetDataType] " << pTypeString << " data type is " << mDataType << std::endl;
 }
 

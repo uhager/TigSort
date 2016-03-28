@@ -3,17 +3,16 @@
 
 #include <iostream>
 #include <sstream>
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <fstream>
-#include <strstream>
+
 #include <TROOT.h>
 #include <TFolder.h>
 
-#include <TigManager.h>
-#include <TigTree.h>
+#include "TigManager.h"
+#include "TigTree.h"
 
 
-using namespace std;
 
 static TigManager* gInstance = NULL;
 
@@ -29,7 +28,7 @@ TigManager::TigManager(void)
 
   else
     {
-      cout << "[TigManager::TigManager]  Manager is a singleton class and can only be constructed once." << endl;
+      std::cout << "[TigManager::TigManager]  Manager is a singleton class and can only be constructed once." << std::endl;
       exit(1);
     }
 }
@@ -44,7 +43,7 @@ TigManager::~TigManager(void)
 void
 TigManager::Clear(void)
 {
-  vector<TigTree*>::iterator trees;
+  std::vector<TigTree*>::iterator trees;
   for ( trees=mTrees.begin(); trees< mTrees.end(); trees++)
     delete (*trees);
   mTrees.clear();	
@@ -56,7 +55,7 @@ TigManager::Instance(void)
 {
   if ( !gInstance)
     {
-      cout << "[TigManager::Instance]  Must construct a manager before calling Instance." << endl;
+      std::cout << "[TigManager::Instance]  Must construct a manager before calling Instance." << std::endl;
       exit(1);
     }
 	
@@ -67,33 +66,33 @@ TigManager::Instance(void)
 void
 TigManager::FlushTreeBuffers()
 {
-  vector<TigTree*>::iterator trees;
+  std::vector<TigTree*>::iterator trees;
   for ( trees=mTrees.begin(); trees< mTrees.end(); trees++) (*trees)->FlushBuffer();
 }
 
 //---- ParseInputFile
 void
-TigManager::ParseInputFile(string configFile)
+TigManager::ParseInputFile(std::string configFile)
 {
   //  char *inputFile = NULL;
-  string inputFile = "-"; 
+  std::string inputFile = "-"; 
   if (configFile.compare("-") != 0) inputFile = configFile;
   else inputFile = getenv("TIGSORT_INPUT");
   if (inputFile.compare("-") == 0)
     {
-      cout << "[KoManager::ParseInputFile]  No 'TIGSORT_INPUT' input file specified ";
+      std::cout << "[KoManager::ParseInputFile]  No 'TIGSORT_INPUT' input file specified ";
       exit(1);
     }
 
-  string line, token;
+  std::string line, token;
   ifstream input(inputFile.c_str());
   this->Clear();
-  cout << "Parsing TigSort specification file...";
+  std::cout << "Parsing TigSort specification file...";
 
   getline(input,line);
   while ( input)
     {
-      istrstream stream(line.c_str());
+      std::istringstream stream(line.c_str());
      
       stream >> token;
       if ( token == "" || token[0] == '#')
@@ -110,21 +109,21 @@ TigManager::ParseInputFile(string configFile)
       if ( input)
 	getline(input,line);
     }
-  cout << "TigManager input parsing done.\n";
+  std::cout << "TigManager input parsing done.\n";
 }
 
 //---- ParseDetector
 TigDetector*
 TigManager::ParseDetector(istream& pStream)
 {
-  string line, token;
+  std::string line, token;
   bool	 bail = false;
   TigDetector*	 det = new TigDetector;
 
   getline(pStream,line);
   while ( pStream && !bail)
     {
-      istrstream stream(line.c_str());
+      std::istringstream stream(line.c_str());
 	
       stream >> token;
       if ( token == "" || token[0] == '#')
@@ -141,7 +140,7 @@ TigManager::ParseDetector(istream& pStream)
       else if ( token.compare("datatype") == 0)
 	{
 	  stream >> token;
-	  vector<int> parameters;
+	  std::vector<int> parameters;
 	  while ( !stream.eof() ) {
 	    parameters.push_back(0);
 	    stream >> parameters.back();
@@ -151,7 +150,7 @@ TigManager::ParseDetector(istream& pStream)
       else if ( token.compare("name") == 0)
 	{	
 	  stream >> token;
-	  cout << ".(" << token << ").";
+	  std::cout << ".(" << token << ").";
 	  det->ChangeName(token);
 	}
       else if ( token.compare("signals") == 0)
@@ -161,9 +160,9 @@ TigManager::ParseDetector(istream& pStream)
 	  getline(pStream,line);
 	  while ( pStream && !bailSignals)
 	    {
-	      istrstream subStream(line.c_str());
+	      std::istringstream subStream(line.c_str());
 			
-	      //	      cout << "signals: " << line << endl;
+	      //	      std::cout << "signals: " << line << std::endl;
 	      subStream >> token;
 	      if ( token == "" || token[0] == '#') {}  //comment or blank
 	      else if ( token.compare("end") == 0)
@@ -171,18 +170,18 @@ TigManager::ParseDetector(istream& pStream)
 	      else if ( token.compare("range") == 0)
 		{
 		  int minCh, maxCh, minAdd, maxAdd;
-		  subStream >> minCh >> maxCh >> hex >> minAdd >> hex >> maxAdd;
-		  //  cout << "[TigManager::ParseDetector] range " << minCh << "\t" << maxCh  << "\t" << minAdd  << "\t" << maxAdd << endl;
+		  subStream >> minCh >> maxCh >> std::hex >> minAdd >> std::hex >> maxAdd;
+		  //  std::cout << "[TigManager::ParseDetector] range " << minCh << "\t" << maxCh  << "\t" << minAdd  << "\t" << maxAdd << std::endl;
 		  det->AddSignals(minCh, maxCh, minAdd, maxAdd);
 		}
 	      else
 		{
 		  int channel;
-		  istringstream ( token ) >> channel;
+		  std::istringstream ( token ) >> channel;
 		  int address;				
-		  subStream >> hex >> address;
+		  subStream >> std::hex >> address;
 		  det->AddSignal(channel,address);
-		  //  cout << "added signal: " << channel << " - " << address << endl;
+		  //  std::cout << "added signal: " << channel << " - " << address << std::endl;
 		}
 	      if ( !bailSignals)
 		getline(pStream,line);
@@ -192,19 +191,19 @@ TigManager::ParseDetector(istream& pStream)
 	getline(pStream,line);
     }
   det->Initialize();
-  //  cout << "new detector: " << det->Name() << " #signals: " << det->Size() << endl;
+  //  std::cout << "new detector: " << det->Name() << " #signals: " << det->Size() << std::endl;
   return det;
 }
 
 //---- ParsePrimitive
 void
-TigManager::ParsePrimitive(string pToken, istream& pStream)
+TigManager::ParsePrimitive(std::string pToken, istream& pStream)
 {
   if ( pToken.compare("tree") == 0)
     this->ParseTree(pStream);
   else
     {
-      cout << "[TigManager::ParsePrimitive]  Unknown primtive token: " << pToken << endl;
+      std::cout << "[TigManager::ParsePrimitive]  Unknown primtive token: " << pToken << std::endl;
     }
 }
 
@@ -212,14 +211,14 @@ TigManager::ParsePrimitive(string pToken, istream& pStream)
 TigScaler*
 TigManager::ParseScaler(istream& pStream)
 {
-  string line, token;
+  std::string line, token;
   bool	 bail = false;
   TigScaler* scaler = new TigScaler;
 
   getline(pStream,line);
   while ( pStream && !bail)
     {
-      istrstream stream(line.c_str());
+      std::istringstream stream(line.c_str());
 	
       stream >> token;
       if ( token == "" || token[0] == '#')
@@ -231,7 +230,7 @@ TigManager::ParseScaler(istream& pStream)
       else if ( token.compare("bank") == 0)
 	{	
 	  stream >> token;
-	  cout << ".(" << token << ").";
+	  std::cout << ".(" << token << ").";
 	  scaler->SetBank(token);
 	}
       else if ( token.compare("signals") == 0)
@@ -241,9 +240,9 @@ TigManager::ParseScaler(istream& pStream)
 	  getline(pStream,line);
 	  while ( pStream && !bailSignals)
 	    {
-	      istrstream subStream(line.c_str());
+	      std::istringstream subStream(line.c_str());
 			
-	      //	      cout << "signals: " << line << endl;
+	      //	      std::cout << "signals: " << line << std::endl;
 	      subStream >> token;
 	      if ( token == "" || token[0] == '#') {}  //comment or blank
 	      else if ( token.compare("end") == 0)
@@ -253,7 +252,7 @@ TigManager::ParseScaler(istream& pStream)
 		  int channel;
 		  subStream >> channel;
 		  scaler->AddRequest(token, channel);
-		  //  cout << "added signal: " << channel << " - " << token << endl;
+		  //  std::cout << "added signal: " << channel << " - " << token << std::endl;
 		}
 	      if ( !bailSignals)
 		getline(pStream,line);
@@ -270,14 +269,14 @@ TigManager::ParseScaler(istream& pStream)
 void
 TigManager::ParseTree(istream& pStream)
 {
-  string line, token;
+  std::string line, token;
   bool	 bail = false;
   TigTree*	 tree = new TigTree;
 
   getline(pStream,line);
   while ( pStream && !bail)
     {
-      istrstream stream(line.c_str());
+      std::istringstream stream(line.c_str());
 	
       stream >> token;
       if ( token == "" || token[0] == '#')
@@ -294,7 +293,7 @@ TigManager::ParseTree(istream& pStream)
       else if ( token.compare("name") == 0)
 	{	
 	  stream >> token;
-	  cout << ".(" << token << ").";
+	  std::cout << ".(" << token << ").";
 	  tree->ChangeName(token);
 	}
       else if ( token.compare("detector") == 0)
@@ -329,14 +328,14 @@ TigManager::ParseTree(istream& pStream)
 TigWaveform*
 TigManager::ParseWaveform(istream& pStream)
 {
-  string line, token;
+  std::string line, token;
   bool	 bail = false;
   TigWaveform*	 det = new TigWaveform;
 
   getline(pStream,line);
   while ( pStream && !bail)
     {
-      istrstream stream(line.c_str());
+      std::istringstream stream(line.c_str());
 	
       stream >> token;
       if ( token == "" || token[0] == '#')
@@ -353,7 +352,7 @@ TigManager::ParseWaveform(istream& pStream)
       else if ( token.compare("name") == 0)
 	{	
 	  stream >> token;
-	  cout << ".(" << token << ").";
+	  std::cout << ".(" << token << ").";
 	  det->ChangeName(token);
 	}
       else if (token.compare("samples")==0)
@@ -369,9 +368,9 @@ TigManager::ParseWaveform(istream& pStream)
 	  getline(pStream,line);
 	  while ( pStream && !bailSignals)
 	    {
-	      istrstream subStream(line.c_str());
+	      std::istringstream subStream(line.c_str());
 			
-	      //	      cout << "signals: " << line << endl;
+	      //	      std::cout << "signals: " << line << std::endl;
 	      subStream >> token;
 	      if ( token == "" || token[0] == '#') {}  //comment or blank
 	      else if ( token.compare("end") == 0)
@@ -379,18 +378,18 @@ TigManager::ParseWaveform(istream& pStream)
 	      else if ( token.compare("range") == 0)
 		{
 		  int minCh, maxCh, minAdd, maxAdd;
-		  subStream >> minCh >> maxCh >> hex >> minAdd >> hex >> maxAdd;
-		  //  cout << "[TigManager::ParseDetector] range " << minCh << "\t" << maxCh  << "\t" << minAdd  << "\t" << maxAdd << endl;
+		  subStream >> minCh >> maxCh >> std::hex >> minAdd >> std::hex >> maxAdd;
+		  //  std::cout << "[TigManager::ParseDetector] range " << minCh << "\t" << maxCh  << "\t" << minAdd  << "\t" << maxAdd << std::endl;
 		  det->AddSignals(minCh, maxCh, minAdd, maxAdd);
 		}
 	      else
 		{
 		  int channel;
-		  istringstream ( token ) >> channel;
+		  std::istringstream ( token ) >> channel;
 		  int address;				
-		  subStream >> hex >> address;
+		  subStream >> std::hex >> address;
 		  det->AddSignal(channel,address);
-		  //  cout << "added signal: " << channel << " - " << address << endl;
+		  //  std::cout << "added signal: " << channel << " - " << address << std::endl;
 		}
 	      if ( !bailSignals)
 		getline(pStream,line);
@@ -400,7 +399,7 @@ TigManager::ParseWaveform(istream& pStream)
 	getline(pStream,line);
     }
   det->Initialize();
-  //  cout << "new detector: " << det->Name() << " #signals: " << det->Size() << endl;
+  //  std::cout << "new detector: " << det->Name() << " #signals: " << det->Size() << std::endl;
   return det;
 }
 
@@ -412,17 +411,17 @@ TigManager::ProcessScaler(TMidasEvent* pEvent)
 {
   if (mMCSUnpack)
     {
-      //  cout << "Processing scaler" << endl;
+      //  std::cout << "Processing scaler" << std::endl;
       WORD*	data;
       int	bankLength, bankType;
       void *ptr;
       int check;
-      vector<string> requestedBanks;
-      string bankName;
+      std::vector<std::string> requestedBanks;
+      std::string bankName;
 
       mTimeStamp = pEvent->GetTimeStamp();
 
-      vector<TigTree*>::iterator trees;
+      std::vector<TigTree*>::iterator trees;
       for ( trees=mTrees.begin(); trees< mTrees.end(); trees++) (*trees)->Banks(requestedBanks);
 
       for (int i = 0; i < requestedBanks.size(); i++)
@@ -430,9 +429,9 @@ TigManager::ProcessScaler(TMidasEvent* pEvent)
 	  bankName = requestedBanks.at(i);
 	  bankLength = pEvent->LocateBank(NULL,bankName.c_str(),&ptr);
 	  data = (WORD*) ptr;
-	  vector<int> values = mMCSUnpack->ProcessData(data, bankLength); 
+	  std::vector<int> values = mMCSUnpack->ProcessData(data, bankLength); 
 	  this->ProcessScalerData(bankName,values);
-	  //      cout << "[TigManager::ProcessScaler] after unpacking: index = " << index << " - bankLength = " << bankLength << endl;
+	  //      std::cout << "[TigManager::ProcessScaler] after unpacking: index = " << index << " - bankLength = " << bankLength << std::endl;
 	}
       bool fillTrees = false;
       for ( trees=mTrees.begin(); trees< mTrees.end(); trees++){
@@ -444,9 +443,9 @@ TigManager::ProcessScaler(TMidasEvent* pEvent)
 
 //---- ProcessScaler
 void
-TigManager::ProcessScalerData(string pBankName, vector<int> pValues)
+TigManager::ProcessScalerData(std::string pBankName, std::vector<int> pValues)
 {
-  vector<TigTree*>::iterator trees;
+  std::vector<TigTree*>::iterator trees;
   for ( trees=mTrees.begin(); trees< mTrees.end(); trees++){
     (*trees)->ProcessScaler(pBankName,pValues);
   }
@@ -456,7 +455,7 @@ TigManager::ProcessScalerData(string pBankName, vector<int> pValues)
 void						
 TigManager::ProcessSignal(TigEvent* pEvent)
 {
-  vector<TigTree*>::iterator trees;
+  std::vector<TigTree*>::iterator trees;
 
   for (trees= mTrees.begin(); trees < mTrees.end(); trees++)
     (*trees)->ProcessSignal(pEvent);
@@ -464,11 +463,11 @@ TigManager::ProcessSignal(TigEvent* pEvent)
 
 //---- ProcessTig64
 void
-TigManager::ProcessTig64(TMidasEvent* pEvent, string pBankName)
+TigManager::ProcessTig64(TMidasEvent* pEvent, std::string pBankName)
 {
   if (mUnpack)
     {
-      //  cout << "Processing Tig64" << endl;
+      //  std::cout << "Processing Tig64" << std::endl;
       WORD*	data;
       // UInt_t	bankLength;
       int	bankLength, bankType;
@@ -485,7 +484,7 @@ TigManager::ProcessTig64(TMidasEvent* pEvent, string pBankName)
 	  check = mUnpack->ProcessData(data+index, bankLength-index); 
 	  if (check < 0) break;
 	  else index += check;
-	  //      cout << "[TigManager::ProcessTig64] after unpacking: index = " << index << " - bankLength = " << bankLength << endl;
+	  //      std::cout << "[TigManager::ProcessTig64] after unpacking: index = " << index << " - bankLength = " << bankLength << std::endl;
 	}
     }
 }

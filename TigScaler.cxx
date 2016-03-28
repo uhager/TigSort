@@ -2,9 +2,9 @@
 // author: Ulrike Hager
 
 #include <iostream>
-#include <TigScaler.h>
 
-using namespace std;
+#include "TigScaler.h"
+
 
 //---- TigScaler
 TigScaler::TigScaler(void)
@@ -21,7 +21,7 @@ TigScaler::~TigScaler(void)
 
 //---- AddRequest
 void 
-TigScaler::AddRequest(string pName, int pChannel)
+TigScaler::AddRequest(std::string pName, int pChannel)
 {
   mNames.push_back(pName);
   mRequested.push_back(pChannel);
@@ -39,11 +39,11 @@ TigScaler::Initialize(void)
 }
 
 //---- Name
-string
+std::string
 TigScaler::Name(int pIndex)
 {
   if (pIndex > mNames.size() ){
-    cout << "[TigScaler::Name] requested name " << pIndex << " out of  " << mNames.size()  << endl;
+    std::cout << "[TigScaler::Name] requested name " << pIndex << " out of  " << mNames.size()  << std::endl;
     return "";
   }
   return mNames.at(pIndex);
@@ -51,12 +51,12 @@ TigScaler::Name(int pIndex)
 
 //---- ProcessEvent
 bool 
-TigScaler::ProcessEvent(vector<int> pData)
+TigScaler::ProcessEvent(std::vector<int> pData)
 {
   for (int i = 0; i<mRequested.size(); i++)
     {
       if (mRequested[i] > pData.size()){
-	cout << "[TigScaler::ProcessEvent] requested scaler channel not in data"<< endl;
+	std::cout << "[TigScaler::ProcessEvent] requested scaler channel not in data"<< std::endl;
 	return false;
       }
       mEventData[i] = pData[ mRequested[i] ];

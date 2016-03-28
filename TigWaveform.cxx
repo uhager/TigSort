@@ -1,5 +1,8 @@
 #include <iostream>
-#include <TigWaveform.h>
+
+#include <TTree.h>
+
+#include "TigWaveform.h"
 
 TigWaveform::TigWaveform()
   : mSamples(4096)
@@ -15,7 +18,7 @@ TigWaveform::~TigWaveform()
 void
 TigWaveform::Initialize()
 {
-  //  cout << "[TigWaveform::Initialize] " << mName << " size " << mAddresses.size() << " samples " << mSamples << endl;
+  //  std::cout << "[TigWaveform::Initialize] " << mName << " size " << mAddresses.size() << " samples " << mSamples << std::endl;
   long numAddresses = mAddresses.size();
   mWaveforms = new int*[numAddresses];
   for (int i=0; i<numAddresses; i++) {
@@ -29,11 +32,11 @@ TigWaveform::Initialize()
 bool
 TigWaveform::ProcessWfEvent(int pChannelIndex, int* pData, int size)
 {
-  // cout << "[TigWaveform::ProcessWfEvent] " << mName << endl;
+  // std::cout << "[TigWaveform::ProcessWfEvent] " << mName << std::endl;
   //bool result = false; 
   //  mHits = 0;
   if (pChannelIndex>mAddresses.size()-1){
-    cout << "[TigWaveform::ProcessWfEvent] " << mName << " index out of bounds" << endl;
+    std::cout << "[TigWaveform::ProcessWfEvent] " << mName << " index out of bounds" << std::endl;
     return false;
   }
   for (int i=0; i<size; i++)
@@ -41,32 +44,32 @@ TigWaveform::ProcessWfEvent(int pChannelIndex, int* pData, int size)
       if (pData[i] > -1){
 	mWaveforms[pChannelIndex][i] = pData[i];
 	if (mNWf[pChannelIndex]==0) mNWf[pChannelIndex]= size;
-	//	cout << mWaveforms[pChannelIndex][i] << " - " ;
+	//	std::cout << mWaveforms[pChannelIndex][i] << " - " ;
       }
       else return true;
     }
-  //  cout << endl;
-  //  cout << "[TigWaveform::ProcessWfEvent] ch " << pChannelIndex << " mNWf[ch] " << mNWf[pChannelIndex]   << endl;
+  //  std::cout << std::endl;
+  //  std::cout << "[TigWaveform::ProcessWfEvent] ch " << pChannelIndex << " mNWf[ch] " << mNWf[pChannelIndex]   << std::endl;
   return true;
 }
 
 bool 
 TigWaveform::ProcessWfSignal(TigEvent* pEvent,int *pChannel, int *pSamples, int *&pWf)
 {
-  //  cout << "[TigWaveform::ProcessWfSignal]" << endl;
+  //  std::cout << "[TigWaveform::ProcessWfSignal]" << std::endl;
 
   if (mAddresses.find(pEvent->Address()) != mAddresses.end() && pEvent->Waveform().size())
     {
       int addr = pEvent->Address();
       mHasEventData = true;
-      vector<short> wf = pEvent->Waveform();
+      std::vector<short> wf = pEvent->Waveform();
       *pChannel = mAddresses[addr];
       *pSamples = wf.size();
-      //      cout << "Channel " << *pChannel << " pSamples " << *pSamples << " mSamples " << mSamples << endl;
+      //      std::cout << "Channel " << *pChannel << " pSamples " << *pSamples << " mSamples " << mSamples << std::endl;
       for (int i=0; i<(*pSamples); i++) {
 	 (pWf[i]) = wf.at(i);
-        // cout << "i " << i << " wf.at(i) " << wf.at(i);
-	// cout << " pWf[i] " << pWf[i] << endl;
+        // std::cout << "i " << i << " wf.at(i) " << wf.at(i);
+	// std::cout << " pWf[i] " << pWf[i] << std::endl;
       }
       return true;
     }
@@ -76,7 +79,7 @@ TigWaveform::ProcessWfSignal(TigEvent* pEvent,int *pChannel, int *pSamples, int 
 void
 TigWaveform::Reset()
 {
-  //  cout << "[TigWaveform::Reset]" << endl;
+  //  std::cout << "[TigWaveform::Reset]" << std::endl;
   for (int i=0; i<mAddresses.size(); i++) {
     memset(mWaveforms[i],0,mSamples * sizeof(int));
   }
@@ -87,7 +90,7 @@ TigWaveform::Reset()
 void
 TigWaveform::SetSamples(int samples)
 {
-  //  cout << "[TigWaveform::SetSamples]" << endl;
+  //  std::cout << "[TigWaveform::SetSamples]" << std::endl;
   mSamples = samples;
 }
 

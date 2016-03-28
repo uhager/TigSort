@@ -3,12 +3,10 @@
 
 #include <iostream>
 #include <vector>
-#include <strings.h>
-#include <stdio.h>
-#include "TigUnpack.h"
-#include <TigManager.h>
 
-using namespace std;
+#include "TigUnpack.h"
+#include "TigManager.h"
+
 
 //----- TigUnpack
 TigUnpack::TigUnpack(void)
@@ -35,7 +33,7 @@ bool bail = false;
 	{
 	  type = pData[index] >> 28;
 	  value = pData[index] & 0x0fffffff;
-	  //	  cout << "data[" << index << "] " << hex<< pData[index] << endl;
+	  //	  std::cout << "data[" << index << "] " << hex<< pData[index] << std::endl;
       switch( type ){
       case 0x0: 
 	pValue = value & 0x3fff;
@@ -47,15 +45,15 @@ bool bail = false;
       case 0x4:                             /*      CFD Time */
 	pValue = value & 0x00ffffff;
 	event->SetCFD(pValue);
-	//	 cout << "[TigUnpack::ProcessData] found CFD: eventID " << event->EventID() << " CFD " << event->CFD() << " charge " << event->Charge() << endl;
+	//	 std::cout << "[TigUnpack::ProcessData] found CFD: eventID " << event->EventID() << " CFD " << event->CFD() << " charge " << event->Charge() << std::endl;
 	break;
       case 0x5:                             /*        Charge */
 	pValue = value & 0xfffffff;
 	if (event->Charge() == -1) {
 	  event->SetCharge(pValue);
-	  //	 cout << "[TigUnpack::ProcessData] found charge: eventID " << event->EventID() << " CFD " << event->CFD() << " charge " << event->Charge() << endl;
+	  //	 std::cout << "[TigUnpack::ProcessData] found charge: eventID " << event->EventID() << " CFD " << event->CFD() << " charge " << event->Charge() << std::endl;
 	}else {
-	 cout << "[TigUnpack::ProcessData] found event that already has charge! eventID " << event->EventID() << " address " << event->Address() << " charge " << event->Charge() << endl;
+	 std::cout << "[TigUnpack::ProcessData] found event that already has charge! eventID " << event->EventID() << " address " << event->Address() << " charge " << event->Charge() << std::endl;
 	  TigManager::Instance().ProcessSignal(event);
 	  delete event;
 	   event = new TigEvent;
@@ -95,7 +93,7 @@ bool bail = false;
       default:  fprintf(stderr,"Reconstruction error 4\n"); return(-1);
       }
    }
- // cout << "[TigUnpack::ProcessData] processing event, channel " <<  pChannel << dec << endl;
+ // std::cout << "[TigUnpack::ProcessData] processing event, channel " <<  pChannel << dec << std::endl;
 	  TigManager::Instance().ProcessSignal(event);
    delete event;
 	return index;
@@ -114,12 +112,12 @@ TigMCSUnpack::~TigMCSUnpack(void)
 }
 
 //---- ProcessData
-vector<int>
+std::vector<int>
 TigMCSUnpack::ProcessData(WORD* pData, long pMaxLength)
 {
  long pValue;
  long index;
- vector<int> values;
+ std::vector<int> values;
 
  for ( index = 0; index < pMaxLength; index++)
    {

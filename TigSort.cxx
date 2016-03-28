@@ -4,14 +4,12 @@
 // based on ROOT analyzer by K.Olchanski
 // using some komodo routines by L. Erikson
 
-#include <stdio.h>
 #include <sys/time.h>
 #include <string>
 #include <iostream>
 #include <sstream>
 #include <fstream>
 #include <iomanip>
-#include <assert.h>
 #include <signal.h>
 
 #include <TMidasOnline.h>
@@ -46,7 +44,7 @@ bool gIsPedestalsRun = false;
 bool gIsOffline = false;
 int  gEventCutoff = 0;
 
-string configFile = "-";
+std::string configFile = "-";
 TDirectory* gOnlineHistDir = NULL;
 TFile* gOutputFile = NULL;
 VirtualOdb* gOdb = NULL;
@@ -59,12 +57,12 @@ TigManager gCatalystMgr;
 void startRun(int transition,int run,int time)
 {
 
-  cout << "startRun" << endl;
+  std::cout << "startRun" << std::endl;
   gIsRunning = true;
   gRunNumber = run;
   //gIsPedestalsRun = gOdb->odbReadBool("/experiment/edit on start/Pedestals run");
   printf("Begin run: %d\n", gRunNumber);
-  //  cout << "run number from odb: " << gOdb->odbReadInt("/Runinfo/Run number") << endl;
+  //  std::cout << "run number from odb: " << gOdb->odbReadInt("/Runinfo/Run number") << std::endl;
     
   if(gOutputFile!=NULL)
   {
@@ -83,14 +81,14 @@ void startRun(int transition,int run,int time)
 #endif
 
    gOutputFile->cd();  
-   //   cout << "starting to parse input" << endl;
+   //   std::cout << "starting to parse input" << std::endl;
    TigManager::Instance().ParseInputFile(configFile);
-   //  cout << "parsed input" << endl;
+   //  std::cout << "parsed input" << std::endl;
   }
 
 void endRun(int transition,int run,int time)
 {
-  // cout << "endRun" << endl;
+  // std::cout << "endRun" << std::endl;
   gIsRunning = false;
   gRunNumber = run;
 
@@ -112,30 +110,30 @@ void endRun(int transition,int run,int time)
 		  time_t startT = gOdb->odbReadUint32("/Runinfo/Start time binary");
 		  time_t stopT = gOdb->odbReadUint32("/Runinfo/Stop time binary");
 	  
-		  string time1(ctime(&startT));
-		  string time2(ctime(&stopT));
+		  std::string time1(ctime(&startT));
+		  std::string time2(ctime(&stopT));
 		  int duration = difftime(stopT,startT);
 
-		  string comment = gOdb->odbReadString("Experiment/Run Parameters/Comment"); 
+		  std::string comment = gOdb->odbReadString("Experiment/Run Parameters/Comment"); 
       
-		  cout << time1.substr(0, 10).c_str() << time1.substr(19, 5).c_str()
-		       << setw(8)           << gRunNumber
-		       << setw(11)          << time1.substr(11, 8).c_str()
-		       << setw(11)          << time2.substr(11, 8).c_str()
-		       << setw(7)           << duration << " s  "
-		       << comment << endl;
+		  std::cout << time1.substr(0, 10).c_str() << time1.substr(19, 5).c_str()
+		       << std::setw(8)           << gRunNumber
+		       << std::setw(11)          << time1.substr(11, 8).c_str()
+		       << std::setw(11)          << time2.substr(11, 8).c_str()
+		       << std::setw(7)           << duration << " s  "
+		       << comment << std::endl;
 
-		  string runlogFile = gOdb->odbReadString("Logger/Data dir");
+		  std::string runlogFile = gOdb->odbReadString("Logger/Data dir");
 		  runlogFile +=  "/runlog.txt";
-		  cout << "runlog file: " << runlogFile << endl;
+		  std::cout << "runlog file: " << runlogFile << std::endl;
 		  ofstream runlog;
 		  runlog.open(runlogFile.c_str(), ofstream::out | ofstream::app);
 		  runlog << time1.substr(0, 10).c_str() << time1.substr(19, 5).c_str()
-			 << setw(8)           << gRunNumber
-			 << setw(11)          << time1.substr(11, 8).c_str()
-			 << setw(11)          << time2.substr(11, 8).c_str()
-			 << setw(7)           << duration << " s  "
-			 << comment << endl;
+			 << std::setw(8)           << gRunNumber
+			 << std::setw(11)          << time1.substr(11, 8).c_str()
+			 << std::setw(11)          << time2.substr(11, 8).c_str()
+			 << std::setw(7)           << duration << " s  "
+			 << comment << std::endl;
 		  runlog.close();
 
 		}
@@ -165,7 +163,7 @@ void HandleMidasEvent(TMidasEvent& pEvent)
   else
     {
       // unknown event type
-      //  cout << "unknown event" << endl;
+      //  std::cout << "unknown event" << std::endl;
 	   //      pEvent.Print();
     }
 }
@@ -190,11 +188,11 @@ int ProcessMidasFile(TApplication*app,const char*fname)
       return -1;
     }
 
-  // string name = fname;
+  // std::string name = fname;
   // name = name.substr(name.find_last_of("/\\")+1);
   // int firstNum = name.find_first_of("0123456789");
-  // string number = name.substr(firstNum, name.find(".")-firstNum);
-  // istringstream(number) >> firstNum;
+  // std::string number = name.substr(firstNum, name.find(".")-firstNum);
+  // std::istringstream(number) >> firstNum;
   // 	  startRun(0,firstNum,0);
 
 	  int i=0;
@@ -224,8 +222,8 @@ int ProcessMidasFile(TApplication*app,const char*fname)
 	    delete gOdb;
 	   gOdb = new XmlOdb(event.GetData(),event.GetDataSize());
       	  startRun(0,event.GetSerialNumber(),0);
-	  cout << "Running...";
-	  cout.flush();
+	  std::cout << "Running...";
+	  std::cout.flush();
 
 		}
 	   else if ((eventId & 0xFFFF) == 0x8001)
@@ -245,8 +243,8 @@ int ProcessMidasFile(TApplication*app,const char*fname)
 	{
 	  //resetClock2time();
 	  //	  printf("Processing event %d\n",i);
-	  cout << "." ;
-	  cout.flush();
+	  std::cout << "." ;
+	  std::cout.flush();
 	}
       
       i++;
@@ -348,21 +346,12 @@ int ShowMem(const char* label)
 void help()
 {
   printf("\nUsage:\n");
-  printf("\n./analyzer.exe [-h] [-Hhostname] [-Eexptname] [-eMaxEvents] [-P9091] [-p9090] [-m] [-g] [file1 file2 ...]\n");
-  printf("\n");
   printf("\t-h: print this help message\n");
   printf("\t-c: config file (mapping)\n");
-  printf("\t-T: test mode - start and serve a test histogram\n");
-  printf("\t-Hhostname: connect to MIDAS experiment on given host\n");
-  printf("\t-Eexptname: connect to this MIDAS experiment\n");
   printf("\t-P: Start the TNetDirectory server on specified tcp port (for use with roody -Plocalhost:9091)\n");
   printf("\t-p: Start the old midas histogram server on specified tcp port (for use with roody -Hlocalhost:9090)\n");
   printf("\t-e: Number of events to read from input data files\n");
-  printf("\t-m: Enable memory leak debugging\n");
-  printf("\t-g: Enable graphics display when processing data files\n");
   printf("\n");
-  printf("Example1: analyze online data: ./analyzer.exe -P9091\n");
-  printf("Example2: analyze existing data: ./analyzer.exe /data/alpha/current/run00500.mid\n");
   exit(1);
 }
 

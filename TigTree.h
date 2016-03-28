@@ -6,13 +6,15 @@
 
 #include <vector>
 #include <string>
-#include <TTree.h>
-#include <TigEvent.h>
-#include <TigDetector.h>
-#include <TigScaler.h>
-#include <TigWaveform.h>
 
-using namespace std;
+#include <TTree.h>
+
+#include "TigEvent.h"
+#include "TigDetector.h"
+#include "TigScaler.h"
+#include "TigWaveform.h"
+
+
 
 class TigAssemble
 {
@@ -28,20 +30,20 @@ class TigAssemble
   int AnaEventID(){return mAnaEventID;}
   int* Data(int pDet);
   int EventID(){return mEventID;}
-  void SetDetectors(vector<int*> pDets){mEventData = pDets;}
+  void SetDetectors(std::vector<int*> pDets){mEventData = pDets;}
   void SetEventID(int pEventID){mEventID = pEventID;}
   void SetAnaEventID(int pEventID){mAnaEventID = pEventID;}
   int Size(){return mEventData.size();}
   int* Waveform(int pDet, int pChannel);
-  vector<int*> WaveformForDetector(int pDet);
-  vector<int> NSamplesForDetector(int pDet){return mNWf.at(pDet);}
+  std::vector<int*> WaveformForDetector(int pDet);
+  std::vector<int> NSamplesForDetector(int pDet){return mNWf.at(pDet);}
 
  private:
   int mEventID;
   int mAnaEventID;
-  vector<int*> mEventData;
-  vector<vector<int*> > mWaveforms;
-  vector<vector<int> > mNWf;
+  std::vector<int*> mEventData;
+  std::vector<std::vector<int*> > mWaveforms;
+  std::vector<std::vector<int> > mNWf;
 };
 
 class TigTree
@@ -53,19 +55,19 @@ class TigTree
   void AddDetector(TigDetector* pToAdd);
   void AddScaler(TigScaler* pToAdd);
   void AddWaveform(TigWaveform* pToAdd);
-  void Banks(vector<string> &pRequested);
+  void Banks(std::vector<std::string> &pRequested);
   int Buffer(){return mBuffer;}
-  void ChangeDescription(string pDesc)	{ mDescription = pDesc; }
-  void ChangeName(string pName)			{ mName = pName; }
+  void ChangeDescription(std::string pDesc)	{ mDescription = pDesc; }
+  void ChangeName(std::string pName)			{ mName = pName; }
   void DeleteTTree(){mTree->Delete();}
   bool FillTree();
   bool FillTree(TigAssemble* pAssembled);
-  bool FindScalerBank(string pBankName);
+  bool FindScalerBank(std::string pBankName);
   void FlushBuffer();
   void Initialize(void);
-  string Name(void) { return mName; }
+  std::string Name(void) { return mName; }
   bool ProcessSignal(TigEvent* pEvent);
-  bool ProcessScaler(string pBankName, vector<int> pValues);
+  bool ProcessScaler(std::string pBankName, std::vector<int> pValues);
   void SetBuffer(int pBuffer){mBuffer=pBuffer;}
 
  protected:			//----- protected ------------------
@@ -73,16 +75,16 @@ class TigTree
   long BranchCount(void) const;
   void ProcessValues(void);
 
-  vector<int*> MakeAssembled();
+  std::vector<int*> MakeAssembled();
   int mAnaEventID;
-  vector<TigAssemble*> mAssembled;
+  std::vector<TigAssemble*> mAssembled;
   int mBuffer;
-  string mDescription;
-  vector<TigDetector*>   mDetectors;
+  std::string mDescription;
+  std::vector<TigDetector*>   mDetectors;
   bool mHasEventData;
-  string mName;
-  vector<TigScaler*>   mScalers;
-  vector<TigWaveform*>   mWaveforms;
+  std::string mName;
+  std::vector<TigScaler*>   mScalers;
+  std::vector<TigWaveform*>   mWaveforms;
   int mTimeStamp;
   TTree* mTree;
   int mTrigEventID;

@@ -3,7 +3,8 @@
 
 #include <iostream>
 #include <cmath>
-#include <TigEvent.h>
+
+#include "TigEvent.h"
 
 //---- TigEvent
 TigEvent::TigEvent(void)
@@ -36,14 +37,14 @@ TigEvent::AddWfSample(int pSample)
 
 //---- CalcWfBase
 int
-TigEvent::CalcWfBase(vector<int> pParameters)
+TigEvent::CalcWfBase(std::vector<int> pParameters)
 {
   if (mWaveform.size()<250){
-    cout << "[TigEvent::CalcWfBase] incomplete waveform, length " << mWaveform.size() << endl;
+    std::cout << "[TigEvent::CalcWfBase] incomplete waveform, length " << mWaveform.size() << std::endl;
     return -1;
   }
   if (pParameters.size()<4){
-    cout << "[TigEvent::CalcWfBase] too few parameters " << pParameters.size() << endl;
+    std::cout << "[TigEvent::CalcWfBase] too few parameters " << pParameters.size() << std::endl;
     return -1;
   }
   int result = 0;
@@ -56,14 +57,14 @@ TigEvent::CalcWfBase(vector<int> pParameters)
 
 //---- CalcWfEnergy
 int
-TigEvent::CalcWfEnergy(vector<int> pParameters)
+TigEvent::CalcWfEnergy(std::vector<int> pParameters)
 {
   if (mWaveform.size()<250){
-    cout << "[TigEvent::CalcWfEnergy] incomplete waveform, length " << mWaveform.size() << endl;
+    std::cout << "[TigEvent::CalcWfEnergy] incomplete waveform, length " << mWaveform.size() << std::endl;
     return -1;
   }
   if (pParameters.size()<6){
-    cout << "[TigEvent::CalcWfEnergy] too few parameters " << pParameters.size() << endl;
+    std::cout << "[TigEvent::CalcWfEnergy] too few parameters " << pParameters.size() << std::endl;
     return -1;
   }
   int result = 0;
@@ -101,25 +102,25 @@ TigEvent::CalcWfMinBin()
 	result = i;
       }
     }
-  // cout << "wf: " ;
+  // std::cout << "wf: " ;
   // for (int i=0; i<mWaveform.size();i++) {
-  //   if (i==result) cout << " _" << mWaveform.at(i) << "_";
-  //   else cout << " " << mWaveform.at(i);
+  //   if (i==result) std::cout << " _" << mWaveform.at(i) << "_";
+  //   else std::cout << " " << mWaveform.at(i);
   //   }
-  // cout << endl;
+  // std::cout << std::endl;
   return result;
 }
 
 //---- CalcWfEnergy
 int
-TigEvent::CalcWfPeak(vector<int> pParameters)
+TigEvent::CalcWfPeak(std::vector<int> pParameters)
 {
   if (mWaveform.size()<250){
-    cout << "[TigEvent::CalcWfPeak] incomplete waveform, length " << mWaveform.size() << endl;
+    std::cout << "[TigEvent::CalcWfPeak] incomplete waveform, length " << mWaveform.size() << std::endl;
     return -1;
   }
   if (pParameters.size()<2){
-    cout << "[TigEvent::CalcWfPeak] too few parameters " << pParameters.size() << endl;
+    std::cout << "[TigEvent::CalcWfPeak] too few parameters " << pParameters.size() << std::endl;
     return -1;
   }
   int result = 0;
@@ -130,7 +131,7 @@ TigEvent::CalcWfPeak(vector<int> pParameters)
 
 //---- Value
 int
-TigEvent::Value(int pDataType, vector<int> pParameters)
+TigEvent::Value(int pDataType, std::vector<int> pParameters)
 {
   switch(pDataType){
   case 0:

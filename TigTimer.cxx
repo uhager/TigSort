@@ -1,4 +1,7 @@
-#include <TigTimer.h>
+#include <sys/time.h>
+#include <assert.h>
+
+#include "TigTimer.h"
 
 
 TigTimer::TigTimer(int period_msec,TimerHandler handler)
